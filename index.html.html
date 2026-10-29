@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<!--
+  WAHM STORE - EDIT GUIDE (for anyone working on this file)
+  =====================================================================
+  لوحة التحكم الكاملة في المنتجات، التصنيفات، والأوسمة (Tags & Categories):
+  =====================================================================
+  1. ألوان التاجات والأوسمة (Tag Colors):
+     ابحث عن: const TC = { ... }
+     تقدر تغير لون أي تصنيف زي Gourmand أو Fruity أو تضنيف جديد بالكامل براحتك.
+  
+  2. إضافة، تعديل، أو حذف المنتجات (Products P):
+     ابحث عن: const P = [ ... ]
+     كل منتج مكتوب بالترتيب التالي:
+     ['اسم البرفان', 'التصنيف/التاج (مثل Gourmand أو Fruity)', السعر, 'لون الإزازة 1', 'لون الإزازة 2', 'مسار الصورة (اكتب '' لو مفيش صورة وعايز شكل الإزازة الافتراضي)', 'وصف البرفان بالكامل', ['أقسام الظهور مثل men أو women']]
+     
+     * تقدر تغير كلمة 'Gourmand' أو 'Fruity' لأي كلمة ثانية في أي منتج.
+     * تقدر تضيف منتجات جديدة بنفس الشكل تماماً وتحدد تظهر في أي سكشن.
+     * الترتيب اللي بتكتب بيه المنتجات هنا هو نفس ترتيب ظهورها في الموقع (وتقدر ترتبهم زي ما تحب).
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WAHM</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--font:'Barlow',system-ui,sans-serif;--gold:#a8935f;--gold-d:#8e7a4c;--ink:#111;--muted:#6b6b6b;--bg:#fff;--soft:#f3f1ee;color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-weight:500;line-height:1.35;overflow-x:hidden}
+a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wm{height:44px;width:auto;display:block}
+/* announcement */
+.bar{background:var(--gold);color:#fff;overflow:hidden;white-space:nowrap;font-weight:700;font-size:.9rem;padding:11px 0}
+.bar div{display:inline-block;animation:slide 22s linear infinite}
+.bar span{margin:0 18px}
+@keyframes slide{to{transform:translateX(-50%)}}
+/* header */
+header{position:absolute;left:0;right:0;top:41px;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;color:#fff}
+header .l,header .r{display:flex;gap:18px;align-items:center;width:90px}header .r{justify-content:flex-end}
+header button{background:none;border:0;color:inherit;position:relative}
+.cnt{position:absolute;top:-8px;right:-10px;background:var(--gold);color:#fff;font-size:.65rem;font-weight:700;border-radius:99px;min-width:17px;height:17px;display:grid;place-items:center}
+/* hero */
+.hero{position:relative;min-height:640px;background:radial-gradient(120% 80% at 75% 55%,#5a4632 0%,#241a12 45%,#0c0907 100%);color:#fff;padding:190px 24px 70px;overflow:hidden}
+.hero small{display:block;font-weight:600;letter-spacing:.04em;margin-bottom:18px}
+.hero h1{font-size:clamp(2.6rem,9vw,4.6rem);font-weight:600;line-height:1.02;max-width:420px}
+.pill{display:inline-block;background:var(--gold);color:#fff;border:0;border-radius:99px;padding:16px 38px;font-weight:700;margin-top:34px;transition:.3s}
+.pill:hover{background:var(--gold-d);transform:translateY(-2px)}
+.hero .bot{position:absolute;right:8%;bottom:90px;transform:scale(1.5);transform-origin:bottom right;animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:scale(1.5) translateY(-12px)}}
+/* bottle */
+.bot{width:74px;height:120px;position:relative;margin-top:36px}
+.bot::before{content:"";position:absolute;left:50%;top:-34px;width:30px;height:34px;transform:translateX(-50%);background:linear-gradient(90deg,#8a6a2a,#e6c36a,#8a6a2a);border-radius:3px 3px 0 0}
+.bot i{position:absolute;inset:0;border-radius:10px;background:linear-gradient(120deg,var(--c1,#d8d8d8),var(--c2,#7a7a7a));box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
+.bot b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:70%;height:54%;background:#111;border:2px solid #e8e3d8;display:grid;place-items:center;color:#e8e3d8;font-size:.55rem;letter-spacing:.14em;font-weight:700}
+/* rating */
+.rate{padding:18px 20px;font-size:.95rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rate .s{color:#d39b2a;letter-spacing:2px}.rate em{font-style:normal;color:#2e6b2e;font-weight:700}
+.rate .d{color:var(--gold)}
+/* section heads */
+.sh{padding:26px 20px 8px}
+.sh h2{font-size:2.1rem;font-weight:700;line-height:1.1}
+.va{display:inline-flex;align-items:center;gap:10px;margin-top:12px;font-weight:500}
+.va u{text-decoration:none;width:30px;height:30px;border-radius:50%;background:#ececec;display:grid;place-items:center;font-size:1rem;transition:.25s}
+.va:hover u{background:var(--gold);color:#fff;transform:translateX(4px)}
+/* carousel */
+.car{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:20px;scrollbar-width:none}
+.car::-webkit-scrollbar{display:none}
+.cc{flex:0 0 78%;max-width:340px;scroll-snap-align:center;background:var(--gold);border-radius:10px;overflow:hidden;color:#fff;transition:.35s}
+.cc:hover{transform:translateY(-5px)}
+.cc .im{height:300px;position:relative;display:grid;place-items:center}
+.cc .t{padding:16px 18px 20px;font-size:.9rem}
+.cc .t p{opacity:.8}.cc .t h3{font-size:1.05rem;font-weight:700;margin:2px 0 6px}
+.tag{position:absolute;top:14px;right:14px;background:var(--tc,#8a6a3b);color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:99px}
+.qa{position:absolute;right:14px;bottom:14px;width:42px;height:42px;border-radius:50%;background:#fff;color:var(--ink);border:0;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:.25s}
+.qa:hover{background:var(--ink);color:#fff;transform:scale(1.1)}
+.qa.ok{background:#2e6b2e;color:#fff}
+/* stats */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px 20px 30px}
+.stat{background:var(--soft);border-radius:12px;padding:18px;min-height:130px}
+.stat b{font-size:1.6rem;font-weight:700;display:block}.stat span{font-size:.8rem;color:var(--muted)}
+.stat.g{background:linear-gradient(160deg,#e8b83a,#f6d97a)}
+/* grid */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:26px 12px;padding:16px 12px 120px}
+.pc .im{height:210px;position:relative;display:grid;place-items:center;border-radius:4px;overflow:hidden}
+.pc .im .bot{transform:scale(.95);transition:.5s}.pc:hover .im .bot{transform:scale(1.08) translateY(-4px)}
+.pc .br{font-size:.8rem;color:var(--muted);margin-top:10px}
+.pc h3{font-size:1rem;font-weight:700;margin:2px 0}.pc .pr{color:var(--muted);font-size:.9rem}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .7s,transform .7s}.rv.in{opacity:1;transform:none}
+/* energy */
+.en{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:20px;scrollbar-width:none}
+.en::-webkit-scrollbar{display:none}
+.et{flex:0 0 150px;height:230px;border-radius:12px;scroll-snap-align:start;color:#fff;font-size:1.9rem;font-weight:700;line-height:1;padding:18px 14px;display:flex;align-items:flex-end;text-transform:uppercase;transition:.35s;position:relative;overflow:hidden}
+.et:hover{transform:scale(1.04)}
+.et img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transition:.4s}
+.et:hover img{transform:scale(1.08)}
+.et.has-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.68) 100%);z-index:1}
+.et span{position:relative;z-index:2}
+/* floating filter */
+.fb{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;border:0;border-radius:99px;padding:15px 26px;font-weight:600;display:flex;gap:10px;align-items:center;z-index:8;box-shadow:0 6px 20px rgba(0,0,0,.3);transition:.3s}
+.fb:hover{background:var(--gold-d)}
+/* sheets */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.35s;z-index:20}
+.ov.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:26px 22px 34px;transform:translateY(100%);transition:.4s cubic-bezier(.2,.8,.2,1);z-index:21}
+.sheet.on{transform:none}
+.sheet h4{font-size:1.2rem;margin-bottom:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.chip{border:1px solid #ccc;background:#fff;border-radius:99px;padding:9px 18px;font-weight:600;font-size:.9rem;transition:.2s}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:78%;max-width:320px;background:#fff;transform:translateX(-100%);transition:.4s cubic-bezier(.2,.8,.2,1);z-index:21;padding:30px 26px}
+.drawer.on{transform:none}
+.drawer a{display:block;font-size:1.4rem;font-weight:600;padding:14px 0;border-bottom:1px solid #eee}
+.drawer a:hover{color:var(--gold)}
+/* footer */
+footer{background:#1b1b1b;color:#fff;padding:40px 22px 30px}
+footer h3{font-size:1.5rem;font-weight:700;max-width:260px;margin-bottom:22px}
+footer form{display:flex;border:1px solid #444;border-radius:6px;overflow:hidden;margin-bottom:26px}
+footer input{flex:1;background:none;border:0;padding:15px;color:#fff;font:inherit;outline:0;min-width:0}
+footer form button{background:none;border:0;color:#fff;padding:0 18px;font-size:1.1rem}
+footer p{font-size:.78rem;color:#999;margin-top:16px}
+.toast{position:fixed;top:60px;left:50%;transform:translate(-50%,-120px);background:var(--ink);color:#fff;padding:12px 24px;border-radius:99px;font-weight:600;font-size:.9rem;transition:.4s;z-index:30}
+.toast.on{transform:translate(-50%,0)}
+@media(min-width:760px){.grid{grid-template-columns:repeat(4,1fr);padding:16px 40px 120px}.sh,.rate,.car,.stats,.en{padding-left:40px;padding-right:40px}.hero{padding-left:60px}.hero .bot{right:18%}}
+
+.hero .himg{position:absolute;right:8%;bottom:40px;width:280px;max-width:45%;height:auto;object-fit:contain;filter:drop-shadow(0 15px 25px rgba(0,0,0,.35));animation:float2 6s ease-in-out infinite}
+@keyframes float2{50%{transform:translateY(-12px)}}
+@media(min-width:760px){.hero .himg{right:14%}}
+.gal{position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.gal::-webkit-scrollbar{display:none}
+.gal img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:center}
+.gnav{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.88);font-size:1.4rem;line-height:1;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.gl{left:10px}.gr{right:10px}
+.dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:7px;z-index:2}
+.dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.65);box-shadow:0 0 0 1px rgba(0,0,0,.25);cursor:pointer}
+.dots i.on{background:#111}
+.pim .tag{right:auto;left:14px;z-index:2}
+/* product page, cart */
+.im img{width:100%;height:100%;object-fit:cover;display:block}
+.cc .im img{position:absolute;inset:0}.pc .im img{position:absolute;inset:0}
+[data-p]{cursor:pointer}
+.pd,.cartp{position:fixed;left:0;right:0;bottom:0;max-height:92%;overflow:auto;background:#fff;border-radius:18px 18px 0 0;transform:translateY(105%);transition:.4s cubic-bezier(.2,.8,.2,1);z-index:22;padding:0 0 28px}
+.pd.on,.cartp.on{transform:none}
+@media(min-width:760px){.pd,.cartp{left:50%;right:auto;width:480px;margin-left:-240px}}
+.pd .x,.cartp .x{position:absolute;top:12px;right:14px;width:38px;height:38px;border-radius:50%;border:0;background:#fff;font-size:1.4rem;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.pim{height:320px;position:relative;display:grid;place-items:center;border-radius:18px 18px 0 0;overflow:hidden}
+.pin{padding:20px 22px 0}
+.pin .pb{color:var(--muted);font-size:.85rem}
+.pin h2{font-size:1.8rem;font-weight:700;margin:2px 0 6px}
+.pin .ppr{font-size:1.3rem;font-weight:700;color:var(--gold-d);margin-bottom:12px}
+.pin .pdsc{color:#444;line-height:1.55;margin-bottom:18px}
+.qty{display:flex;align-items:center;gap:18px;margin-bottom:16px}
+.qty button{width:40px;height:40px;border-radius:50%;border:1px solid #ccc;background:#fff;font-size:1.2rem}
+.qty b{font-size:1.1rem;min-width:20px;text-align:center}
+.btn{display:block;width:100%;text-align:center;border:0;border-radius:99px;padding:15px;font-weight:700;font-size:1rem;margin-top:10px;background:var(--ink);color:#fff}
+.btn.wa{background:#1f9d55}
+.btn.ghost{background:#eee;color:var(--ink)}
+.cartp h4{font-size:1.4rem;padding:22px 22px 8px}
+.cartp .body{padding:0 22px}
+.ci{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #eee}
+.ci small{color:var(--muted);display:block}
+.ci .cq{display:flex;align-items:center;gap:8px}
+.ci .cq button{width:30px;height:30px;border-radius:50%;border:1px solid #ccc;background:#fff}
+.ctot{display:flex;justify-content:space-between;font-weight:700;font-size:1.15rem;padding:16px 0 4px}
+
+.inp{width:100%;padding:13px;border:1px solid #ccc;border-radius:8px;font:inherit;margin:4px 0 14px;background:#fff;color:var(--ink)}
+.body label{font-weight:600;font-size:.9rem}
+.err{color:#c0392b;font-size:.9rem;min-height:1.2em;margin-top:6px}
+.srow{display:flex;justify-content:space-between;padding:4px 0;color:#444}
+.tabs{display:flex;gap:8px;padding:12px 20px 4px;overflow-x:auto}
+.sold .im::after{content:"SOLD OUT";position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.7);color:#111;font-weight:700;letter-spacing:.12em;font-size:1.05rem;z-index:1}
+.sold .qa{display:none}
+.sold .tag{z-index:2}
+.btn[disabled]{background:#ddd;color:#777;cursor:not-allowed}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="wahm" viewBox="0 0 260 110"><g fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-8 130 55)"><path d="M10 26C10 52 14 80 24 84C34 88 34 54 38 46C42 58 46 82 56 82C66 82 68 46 70 22"/><path d="M84 88L104 20L122 88M90 62L116 60"/><path d="M138 22L136 90M174 20L172 88M136 56L174 54"/><path d="M190 80L194 28L210 66L230 22L236 88"/></g><path fill="currentColor" d="M244 4Q246 18 258 22Q246 26 244 40Q242 26 230 22Q242 18 244 4Z" transform="translate(-6 -4) scale(.9)"/></symbol>
+<symbol id="cart" viewBox="0 0 24 24"><path d="M3 10h18l-2 10H5L3 10zM8 10l4-6 4 6"/></symbol>
+</defs></svg>
+
+ <div class="bar" id="topBar"><div id="mq"></div></div>
+<header id="mainHeader">
+  <div class="l"><button id="menuB" aria-label="Menu"><svg class="i"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button><button aria-label="Search"><svg class="i"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button></div>
+  <a href="#top" aria-label="WAHM"><svg class="wm" viewBox="0 0 260 110"><use href="#wahm"/></svg></a>
+  <div class="r"><button id="cartB" aria-label="Cart"><svg class="i"><use href="#cart"/></svg><span class="cnt" id="cnt">0</span></button></div>
+</header>
+
+<main id="top">
+<section class="hero" id="heroSec">
+  <small id="heroSmall">LUXURY IS A STATEMENT</small>
+  <h1 id="heroTitle">2 x 100ML For 1,400 EGP</h1>
+  <a href="#all" class="pill" id="heroBtn">EXPLORE</a>
+  <img class="himg" id="heroImg" alt="WAHM Perfume" style="display:none">
+  <div class="bot" id="heroBot" style="--c1:#e9e6df;--c2:#9b9890"><i></i><b id="heroBotLbl">WAHM</b></div>
+</section>
+
+<!-- شريط النجوم والتقييمات والميمبرز -->
+<div class="rate" id="rateSec"><span class="s">★★★★★</span><span>4.89 stars</span><span class="d">•</span><em>2,000+</em><span>reviews</span><span class="d">•</span><em>50K+</em><span>members</span></div>
+
+<!-- قسم Winter Launches -->
+<div class="sh" id="launchesHead"><h2 id="launchesTitle">Winter Launches S’2026</h2><a class="va" href="#all" id="launchesLink">View all <u>›</u></a></div>
+<div class="car" id="car"></div>
+
+<!-- مربعات الأرقام والإحصائيات (Bottles Sold & Reviews) -->
+<div class="stats" id="statsSec">
+  <div class="stat"><b>45,000+</b>Bottles Sold<br><span>over 45K bottles sold in 2026</span></div>
+  <div class="stat g"><b>2,000+</b>Reviews<br><span>over 2,000 5-star reviews</span></div>
+</div>
+
+<!-- قسم كل البرفانات والتابات -->
+<div class="sh" id="all"><h2 id="allTitle">All Fragrances</h2></div>
+<div class="tabs" id="tabs"></div>
+<div class="grid" id="grid"></div>
+
+<!-- قسم Pick Your Energy -->
+<div class="sh" id="energyHead"><h2 id="energyTitle">Pick Your Energy</h2></div>
+<div class="en" id="energyList"></div>
+</main>
+
+<footer id="footerSec">
+  <div id="signupBox">
+    <h3 id="signupTitle">Sign up for new stories and personal offers</h3>
+    <form id="nf"><input type="email" id="signupInput" placeholder="E-mail" required aria-label="Email"><button aria-label="Subscribe">›</button></form>
+  </div>
+  <p id="copyrightTxt">© 2026, WAHM</p>
+</footer>
+
+<button class="fb" id="fb"><svg class="i" style="width:18px;height:18px"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Filter and sort</button>
+<div class="ov" id="ov"></div>
+<div class="sheet" id="sheet">
+  <h4>Category</h4><div class="chips" id="cats"></div>
+  <h4>Sort by</h4><div class="chips" id="sorts"><button class="chip on" data-s="n">Featured</button><button class="chip" data-s="lo">Price: low to high</button><button class="chip" data-s="hi">Price: high to low</button></div>
+</div>
+<div class="drawer" id="drawer"></div>
+<div class="pd" id="pd"><button class="x" data-x aria-label="Close">×</button>
+  <div class="pim" id="pim"></div>
+  <div class="pin"><p class="pb">WAHM Collection</p><h2 id="pn"></h2><div class="ppr" id="pp"></div>
+  <p class="pdsc" id="pdsc"></p>
+  <div class="qty" id="qrow"><button id="qm">−</button><b id="qn">1</b><button id="qp">+</button></div>
+  <button class="btn" id="padd">Add to cart</button>
+  <button class="btn wa" id="pbuy">Buy now</button>
+  <button class="btn" id="psold" disabled style="display:none">Sold out</button></div></div>
+<div class="cartp" id="cartp"><button class="x" data-x aria-label="Close">×</button><h4>Your cart</h4>
+  <div class="body"><div id="cl"></div><div class="ctot"><span>Total</span><span id="ct"></span></div>
+  <button class="btn wa" id="cgo">Checkout</button>
+  <button class="btn ghost" id="cclr">Clear cart</button></div></div>
+<div class="cartp" id="co"><button class="x" data-x aria-label="Close">×</button><h4>Checkout</h4>
+  <div class="body" id="cform">
+  <label for="cn">Full name</label><input class="inp" id="cn" autocomplete="name">
+  <label for="cph">Phone number</label><input class="inp" id="cph" type="tel" inputmode="tel" autocomplete="tel">
+  <label for="cad">Address</label><textarea class="inp" id="cad" rows="3" autocomplete="street-address"></textarea>
+  <label for="czn">Delivery area</label><select class="inp" id="czn"></select>
+  <label for="ccode">Discount code (optional)</label>
+  <div style="display:flex;gap:8px"><input class="inp" id="ccode" autocapitalize="characters" autocomplete="off" style="margin-bottom:6px"><button class="btn ghost" id="capply" style="width:auto;margin:4px 0 6px;padding:0 20px">Apply</button></div>
+  <p id="cmsg" style="font-size:.9rem;min-height:1.2em;margin-bottom:10px"></p>
+  <div id="csum"></div>
+  <p class="err" id="cerr"></p>
+  <button class="btn wa" id="cok">Confirm order</button>
+  <button class="btn ghost" id="cback">Back to cart</button></div>
+  <div class="body" id="cthx" style="display:none;text-align:center;padding-top:24px"><div style="font-size:3.2rem;color:#1f9d55">✓</div><h3 style="font-size:1.5rem;margin:8px 0">Thank you for your order!</h3><p style="color:#444;line-height:1.5">Your order <b id="coid"></b> is complete.<br>We will contact you soon to confirm delivery.</p><button class="btn" data-x>Close</button></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   ====== لوحة التحكم في الموقع (SETTINGS) ======
+   ===================================================================== */
+
+/* 1. ألوان التاجات والأوسمة (Tag Colors):
+      تقدر تعدل لون أي تاج هنا، أو تضيف تاج جديد بلونه الخاص (مثلاً: Luxury:'#d4af37')
+*/
+const TC={
+  Oriental:'#6b3fa0',
+  Gourmand:'#a8663a',
+  Fruity:'#e08a2e',
+  Woody:'#8a6a3b',
+  Floral:'#d58aa8',
+  Citrus:'#d6a21e'
+  // لو حبيت تضيف تاج جديد اكتبه هنا بنفس الشكل:
+  // Luxury:'#d4af37'
+};
+
+/* 2. إعدادات الـ Top Bar */
+const TOP_BAR = {
+  show: true,
+  texts: [
+    'INDULGE YOUR SENSES',
+    'FREE DELIVERY ABOVE 1,500 EGP'
+  ]
+};
+
+/* 3. الواجهة الرئيسية (Hero Section) */
+const HERO = {
+  smallText: 'LUXURY IS A STATEMENT',
+  mainTitle: '2 x 100ML For 1,000 EGP',
+  buttonText: 'EXPLORE',
+  showBottle: false,        // false = بدون الزجاجة المرسومة اللي بتتحرك
+  bottleColor1: '#e9e6df',
+  bottleColor2: '#9b9890',
+  bottleLabel: 'WAHM',
+  image: '',   // صورة الزجاجة في الواجهة (اسم ملفك). اكتب '' لو عايز الزجاجة المرسومة. لو الملف مش موجود بتظهر المرسومة
+  background: 'hero.jpg.jpeg',           // صورة خلفية للواجهة كلها مثل 'images/bg.jpg' (فاضي = التدرج البني الغامق)
+  overlay: 0.45,            // درجة التعتيم فوق صورة الخلفية عشان الكلام يبان (0 = من غير تعتيم، 1 = أسود)
+  bgColor: 'linear-gradient(160deg,#2b2b2b,#0c0c0c)',              // أو لون سادة للخلفية بدل التدرج، مثل '#1b1b1b' (بيتجاهل لو فيه صورة خلفية)
+  animate: false            // true = الصورة بتتحرك طالع نازل، false = ثابتة
+};
+
+/* 4. شريط النجوم والريفيوهات */
+const RATING_BAR = {
+  show: false,
+  stars: '★★★★★',
+  ratingText: '4.89 stars',
+  reviewsCount: '2,000+',
+  reviewsLabel: 'reviews',
+  membersCount: '50K+',
+  membersLabel: 'members'
+};
+
+/* 5. قسم Winter Launches */
+const LAUNCHES_SECTION = {
+  show: true,
+  title: 'New Collection',
+  viewAllText: 'View all',
+  count: 6, // كم منتج يظهر في السلايدر (أول كم منتج من القائمة تحت)
+  perfumes: [] // أو اختار العطور بالاسم: ['Playboy','Carnation'] (لو كتبت أسماء هنا بتتجاهل count)
+};
+
+/* 6. مربعات الإحصائيات */
+const STATS_SECTION = {
+  show: false,
+  cards: [
+    { number: '45,000+', title: 'Bottles Sold', subtext: 'over 45K bottles sold in 2026', goldStyle: false },
+    { number: '2,000+',  title: 'Reviews',      subtext: 'over 2,000 5-star reviews',    goldStyle: true  }
+  ]
+};
+
+/* 7. تابات الأقسام (Tabs) */
+const ALL_FRAGRANCES_TITLE = 'All Fragrances';
+const ALL_TAB_NAME = 'All';
+const SECTIONS = {
+  men: 'Men',
+  women: 'Women'
+};
+
+/* 8. قسم Pick Your Energy */
+const ENERGY_SECTION = {
+  show: false,
+  title: 'Pick Your Energy',
+  cards: [
+    { title: 'For Him',      sec: 'men',   c1: '#6d8f3a', c2: '#2f4a1a', img: '' },
+    { title: 'For Her',      sec: 'women', c1: '#d6455a', c2: '#8a1f33', img: '' },
+    { title: 'New Drops',    sec: 'all',   c1: '#e8b83a', c2: '#b87a12', img: '' },
+    { title: 'Most Lovable', sec: 'all',   c1: '#5a3a2a', c2: '#1f1410', img: '' },
+    { title: 'Best-sellers', sec: 'all',   c1: '#8aa84a', c2: '#445a1f', img: '' }
+  ]
+};
+
+/* 9. القائمة الجانبية */
+const MENU_LINKS = [
+  { title: 'Home',         href: '#top', sec: '' },
+  { title: 'New Drops',    href: '#car', sec: '' },
+  { title: 'For Him',      href: '#all', sec: 'men' },
+  { title: 'For Her',      href: '#all', sec: 'women' },
+  { title: 'Best-sellers', href: '#all', sec: 'all' }
+];
+
+/* 10. الفوتر */
+const FOOTER_SECTION = {
+  showFooter: true,
+  showSignup: true,
+  signupTitle: 'Sign up for new stories and personal offers',
+  emailPlaceholder: 'E-mail',
+  copyright: '© 2026, WAHM'
+};
+
+/* 11. إعدادات الواتساب والشحن وأكواد الخصم */
+const WA='2011149502071';
+const FREE_FROM=2000;
+const ZONES=[['Cairo',60],['Giza',70],['Alexandria',90],['Other governorates',110]];
+const SOLD_OUT=[]; // اكتب أسماء المنتجات هنا لو خلصت ['Playboy']
+
+const CODES=[
+  {code:'WAHM10', on:true,  percent:10, only:[]},
+  {code:'SAIF100',on:true,  amount:100, only:['Playboy']},
+  {code:'OLD20',  on:false, percent:20, only:[]}
+];
+const ORDER_URL='https://script.google.com/macros/s/AKfycbwcNGMzweaWkMlG-jgM1bkamIKmjKtUmOlbY9tvPBmjIsNt7D1Cq8Q_tH5yI7-L6PUBPA/exec';
+
+/* =====================================================================
+   ====== قائمة المنتجات بالكامل (Products P) ======
+   =====================================================================
+   طريقة كتابة المنتج:
+   ['اسم البرفان', 'التصنيف/التاج (مثال: Gourmand, Fruity, Oriental...)', السعر بالجنيه, 'لون الإزازة 1', 'لون الإزازة 2', 'رابط الصورة (اكتب '' لو مفيش صورة)', 'وصف البرفان (البيو)', ['الأقسام اللي بيظهر فيها زي 'men', 'women' أو سيبها فاضية []']]
+   
+   * ترتيب المنتجات هنا يحدد مكان ظهورها في الموقع (تقدر تغير مكانهم زي ما تحب).
+   * تقدر تضيف أي منتج جديد بنفس الطريقة في أي مكان في القائمة!
+*/
+/* الصورة: اكتب مسار صورة واحدة 'images/a.jpg'  أو أكتر من صورة بين [ ] زي ['images/a.jpg','images/b.jpg','images/c.jpg'] والعميل يقلب بينهم في صفحة العطر. فاضي '' = الزجاجة المرسومة */
+const P=[
+  ['Golden Essence', 'Oriental', 1200, '#c9c3d8', '#3b4656', '', 'A warm, rich oriental scent. 100 ML. Write the full description of this perfume here.', ['men', 'women']],
+  ['Cookies & Cream', 'Gourmand', 1200, '#e9d3b8', '#5a3320', '', 'A sweet, gourmand scent. 100 ML. Write the full description of this perfume here.', ['men', 'women']],
+  ['Carnation', 'Fruity', 1100, '#f2d9a6', '#6b3a1a', '', 'A fresh, fruity scent. 100 ML. Write the full description of this perfume here.', ['women']],
+  ['Playboy', 'Woody', 1300, '#d6d4dc', '#3c4750', '', 'A deep, woody scent. 100 ML. Write the full description of this perfume here.', ['men']],
+  ['Royal Hibiscus', 'Floral', 1200, '#e8c3c6', '#34414f', '', 'A soft, floral scent. 100 ML. Write the full description of this perfume here.', ['women']],
+  ['Sweet Chestnut', 'Gourmand', 1250, '#e8c9a8', '#3a4a52', '', 'A sweet, gourmand scent. 100 ML. Write the full description of this perfume here.', ['men', 'women']],
+  ['Wild Woods', 'Woody', 1200, '#d9cfc2', '#4a2a1c', '', 'A deep, woody scent. 100 ML. Write the full description of this perfume here.', ['men']],
+  ['Marrakech', 'Oriental', 1400, '#e6cfa4', '#5a2a1a', '', 'A warm, rich oriental scent. 100 ML. Write the full description of this perfume here.', ['men', 'women']],
+  ['Fantasy', 'Fruity', 1150, '#f4d0b8', '#4a5560', '', 'A fresh, fruity scent. 100 ML. Write the full description of this perfume here.', ['women']],
+  ['Obsidian', 'Citrus', 1200, '#cfe0cf', '#2f4048', '', 'A bright, citrus scent. 100 ML. Write the full description of this perfume here.', ['men']]
+];
+
+/* =====================================================================
+   ====== تشغيل الموقع (Engine) ======
+   ===================================================================== */
+const $=id=>document.getElementById(id);
+const e=n=>n.toLocaleString('en-US');
+const bot=(p,l)=>`<div class="bot" style="--c1:${p[3]};--c2:${p[4]}"><i></i><b>${l||'WAHM'}</b></div>`;
+const out=p=>SOLD_OUT.includes(p[0]);
+const imgs=p=>Array.isArray(p[5])?p[5].filter(Boolean):(p[5]?[p[5]]:[]);
+const art=(p,l)=>imgs(p).length?`<img src="${imgs(p)[0]}" alt="${p[0]}">`:bot(p,l);
+
+// Render Top Bar
+if(TOP_BAR.show && TOP_BAR.texts.length){
+  $('mq').innerHTML=(TOP_BAR.texts.map(t=>`<span>${t}</span><span>•</span>`).join('')).repeat(8);
+}else{
+  if($('topBar')) $('topBar').style.display='none';
+  if($('mainHeader')) $('mainHeader').style.top='0px';
+}
+
+// Render Hero
+if($('heroSmall')) $('heroSmall').textContent=HERO.smallText;
+if($('heroTitle')) $('heroTitle').textContent=HERO.mainTitle;
+if($('heroBtn')) $('heroBtn').textContent=HERO.buttonText;
+const hb=$('heroBot'),hi=$('heroImg'),hs=$('heroSec');
+if(hb){hb.style.display=HERO.showBottle?'':'none';hb.style.setProperty('--c1',HERO.bottleColor1);hb.style.setProperty('--c2',HERO.bottleColor2);if($('heroBotLbl'))$('heroBotLbl').textContent=HERO.bottleLabel}
+if(!HERO.animate){if(hi)hi.style.animation='none';if(hb)hb.style.animation='none'}
+if(hi&&HERO.image){hi.onload=()=>{hi.style.display='block';if(hb)hb.style.display='none'};hi.onerror=()=>{hi.style.display='none'};hi.src=HERO.image}
+if(hs&&HERO.bgColor&&!HERO.background){hs.style.background=HERO.bgColor}
+if(hs&&HERO.background){const o=HERO.overlay||0;hs.style.backgroundImage=`linear-gradient(rgba(0,0,0,${o}),rgba(0,0,0,${o})),url('${HERO.background}')`;hs.style.backgroundSize='cover';hs.style.backgroundPosition='center'}
+
+// Render Rating Bar
+if($('rateSec')){
+  if(RATING_BAR.show){
+    let rHTML=[];
+    if(RATING_BAR.stars || RATING_BAR.ratingText){
+      rHTML.push(`${RATING_BAR.stars?`<span class="s">${RATING_BAR.stars}</span>`:''}${RATING_BAR.ratingText?`<span>${RATING_BAR.ratingText}</span>`:''}`);
+    }
+    if(RATING_BAR.reviewsCount || RATING_BAR.reviewsLabel){
+      rHTML.push(`<em>${RATING_BAR.reviewsCount}</em><span>${RATING_BAR.reviewsLabel}</span>`);
+    }
+    if(RATING_BAR.membersCount || RATING_BAR.membersLabel){
+      rHTML.push(`<em>${RATING_BAR.membersCount}</em><span>${RATING_BAR.membersLabel}</span>`);
+    }
+    $('rateSec').innerHTML=rHTML.join('<span class="d">•</span>');
+  }else{
+    $('rateSec').style.display='none';
+  }
+}
+
+const LP=(LAUNCHES_SECTION.perfumes&&LAUNCHES_SECTION.perfumes.length)?LAUNCHES_SECTION.perfumes.map(n=>P.find(p=>p[0]===n)).filter(Boolean):P.slice(0,LAUNCHES_SECTION.count);
+// Render Winter Launches Carousel
+if(LAUNCHES_SECTION.show){
+  if($('launchesTitle')) $('launchesTitle').textContent=LAUNCHES_SECTION.title;
+  if($('launchesLink')){
+    if(LAUNCHES_SECTION.viewAllText){
+      $('launchesLink').innerHTML=`${LAUNCHES_SECTION.viewAllText} <u>›</u>`;
+    }else{
+      $('launchesLink').style.display='none';
+    }
+  }
+  if($('car')){
+    $('car').innerHTML=LP.map(p=>`<article class="cc${out(p)?' sold':''}" data-p="${p[0]}"><div class="im" style="background:linear-gradient(160deg,${p[3]},#fff0)">${art(p)}<span class="tag" style="--tc:${TC[p[1]]||'#8a6a3b'}">${p[1]}</span><button class="qa" data-n="${p[0]}" aria-label="Quick add"><svg class="i"><use href="#cart"/></svg></button></div><div class="t"><p>WAHM Collection</p><h3>${p[0]} - 100 ML</h3><p>${e(p[2])} EGP</p></div></article>`).join('');
+  }
+}else{
+  if($('launchesHead')) $('launchesHead').style.display='none';
+  if($('car')) $('car').style.display='none';
+}
+
+// Render Stats
+if($('statsSec')){
+  if(STATS_SECTION.show && STATS_SECTION.cards.length){
+    $('statsSec').innerHTML=STATS_SECTION.cards.map(c=>`<div class="stat${c.goldStyle?' g':''}"><b>${c.number}</b>${c.title}<br><span>${c.subtext}</span></div>`).join('');
+  }else{
+    $('statsSec').style.display='none';
+  }
+}
+
+// Render All Fragrances & Tabs
+if($('allTitle')) $('allTitle').textContent=ALL_FRAGRANCES_TITLE;
+if($('tabs')){
+  $('tabs').innerHTML=[['all',ALL_TAB_NAME],...Object.entries(SECTIONS)].map((t,i)=>`<button class="chip${i?'':' on'}" data-sec="${t[0]}">${t[1]}</button>`).join('');
+}
+
+// Render Pick Your Energy
+if(ENERGY_SECTION.show && ENERGY_SECTION.cards.length){
+  if($('energyTitle')) $('energyTitle').textContent=ENERGY_SECTION.title;
+  if($('energyList')){
+    $('energyList').innerHTML=ENERGY_SECTION.cards.map(c=>`<a class="et${c.img?' has-img':''}" href="#all" data-sec="${c.sec||'all'}" style="background:linear-gradient(160deg,${c.c1||'#555'},${c.c2||'#111'})">${c.img?`<img src="${c.img}" alt="${c.title}">`:''}<span>${c.title}</span></a>`).join('');
+  }
+}else{
+  if($('energyHead')) $('energyHead').style.display='none';
+  if($('energyList')) $('energyList').style.display='none';
+}
+
+// Render Drawer Menu
+if($('drawer')){
+  $('drawer').innerHTML=MENU_LINKS.map(m=>`<a href="${m.href||'#all'}"${m.sec?` data-sec="${m.sec}"`:''}>${m.title}</a>`).join('');
+}
+
+// Render Footer & Signup
+if($('footerSec')){
+  if(!FOOTER_SECTION.showFooter){
+    $('footerSec').style.display='none';
+  }else{
+    if(FOOTER_SECTION.showSignup){
+      if($('signupTitle')) $('signupTitle').textContent=FOOTER_SECTION.signupTitle;
+      if($('signupInput')) $('signupInput').placeholder=FOOTER_SECTION.emailPlaceholder;
+    }else{
+      if($('signupBox')) $('signupBox').style.display='none';
+    }
+    if($('copyrightTxt')) $('copyrightTxt').textContent=FOOTER_SECTION.copyright;
+  }
+}
+
+const grid=$('grid');let cat='all',sort='n',sec='all';
+function draw(){
+  if(!grid) return;
+  let L=P.filter(p=>(cat==='all'||p[1]===cat)&&(sec==='all'||(p[7]||[]).includes(sec)));
+  if(sort==='lo')L=[...L].sort((a,b)=>a[2]-b[2]);if(sort==='hi')L=[...L].sort((a,b)=>b[2]-a[2]);
+  grid.innerHTML=L.map(p=>`<article class="pc rv${out(p)?' sold':''}" data-p="${p[0]}"><div class="im" style="background:linear-gradient(160deg,${p[3]},#fff)">${art(p)}<span class="tag" style="--tc:${TC[p[1]]||'#8a6a3b'}">${p[1]}</span><button class="qa" data-n="${p[0]}" aria-label="Quick add"><svg class="i"><use href="#cart"/></svg></button></div><div class="br">WAHM Collection</div><h3>${p[0]} - 100 ML</h3><div class="pr">${e(p[2])} EGP</div></article>`).join('');
+  obs();
+}
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.1});
+function obs(){document.querySelectorAll('.rv:not(.in)').forEach(x=>io.observe(x))}
+if($('cats')) $('cats').innerHTML=['all',...new Set(P.map(p=>p[1]))].map((c,i)=>`<button class="chip${i?'':' on'}" data-c="${c}">${c==='all'?'All':c}</button>`).join('');
+function tg(el,on){if($(el))$(el).classList.toggle('on',on);if($('ov'))$('ov').classList.toggle('on',on||false)}
+let cart={};try{cart=JSON.parse(localStorage.getItem('wahmCart')||'{}')}catch(x){}
+Object.keys(cart).forEach(k=>{if(SOLD_OUT.includes(k))delete cart[k]});
+const find=nm=>P.find(p=>p[0]===nm);
+const waLink=t=>'https://wa.me/'+WA+'?text='+encodeURIComponent(t);
+function save(){try{localStorage.setItem('wahmCart',JSON.stringify(cart))}catch(x){}}
+function count(){return Object.values(cart).reduce((a,b)=>a+b,0)}
+function add(nm,q){if(q>0&&SOLD_OUT.includes(nm)){toast(nm+' is sold out');return}cart[nm]=(cart[nm]||0)+q;if(cart[nm]<=0)delete cart[nm];save();sync();toast(q>0?nm+' added to cart':nm+' updated')}
+function sync(){if($('cnt'))$('cnt').textContent=count();drawCart()}
+function total(){return Object.entries(cart).reduce((a,[k,v])=>a+find(k)[2]*v,0)}
+function drawCart(){
+  if(!$('cl')||!$('ct')) return;
+  const E=Object.entries(cart).filter(([k])=>find(k));
+  $('cl').innerHTML=E.length?E.map(([k,v])=>`<div class="ci"><div><b>${k}</b><small>${e(find(k)[2])} EGP</small></div><div class="cq"><button data-m="${k}">−</button><b>${v}</b><button data-a="${k}">+</button></div></div>`).join(''):'<p style="padding:14px 0;color:#777">Your cart is empty</p>';
+  $('ct').textContent=e(total())+' EGP';
+}
+
+function setSec(v){
+  if(v!=='all' && !SECTIONS[v]) v='all';
+  sec=v;
+  document.querySelectorAll('#tabs [data-sec]').forEach(x=>x.classList.toggle('on',x.dataset.sec===v));
+  draw();
+}
+if($('czn')) $('czn').innerHTML='<option value="">Choose your area</option>'+ZONES.map((z,i)=>`<option value="${i}">${z[0]} - ${e(z[1])} EGP</option>`).join('');
+let appliedCode='';
+function findCode(c){c=(c||'').trim().toLowerCase();return CODES.find(x=>x.on&&x.code.toLowerCase()===c)}
+function disc(){
+  const c=appliedCode&&findCode(appliedCode);if(!c)return {d:0,c:null};
+  const el=Object.entries(cart).filter(([k])=>find(k)&&(!(c.only&&c.only.length)||c.only.includes(k))).reduce((a,[k,v])=>a+find(k)[2]*v,0);
+  const d=c.percent?Math.round(el*c.percent/100):Math.min(c.amount||0,el);
+  return {d:Math.min(d,el),c};
+}
+function net(){return total()-disc().d}
+function cmsg(t,good){const m=$('cmsg');if(!m)return;m.textContent=t;m.style.color=good?'#1f9d55':'#c0392b'}
+function applyCode(){
+  const val=$('ccode').value.trim();appliedCode='';
+  if(!val){cmsg('',true);drawCo();return true}
+  const c=findCode(val);
+  if(!c){cmsg('Invalid or expired code',false);drawCo();return false}
+  appliedCode=c.code;
+  if(disc().d<=0){appliedCode='';cmsg('This code does not apply to the items in your cart',false);drawCo();return false}
+  cmsg('Code applied: -'+e(disc().d)+' EGP',true);drawCo();return true;
+}
+function fee(){const sub=net();if(!total())return 0;if(FREE_FROM&&sub>=FREE_FROM)return 0;const v=$('czn').value;return v===''?0:ZONES[+v][1]}
+function drawCo(){
+  if(!$('csum')) return;
+  const sub=total(),D=disc(),nt=sub-D.d,f=fee(),v=$('czn').value;
+  const dl=(FREE_FROM&&nt>=FREE_FROM)?'Free':(v===''?'Choose your area':e(f)+' EGP');
+  $('csum').innerHTML=`<div class="srow"><span>Subtotal</span><span>${e(sub)} EGP</span></div>`+(D.d>0?`<div class="srow" style="color:#1f9d55"><span>Discount (${D.c.code})</span><span>-${e(D.d)} EGP</span></div>`:'')+`<div class="srow"><span>Delivery</span><span>${dl}</span></div><div class="ctot"><span>Total</span><span>${e(nt+f)} EGP</span></div>`;
+}
+if($('ccode')) $('ccode').oninput=()=>{appliedCode='';if($('cmsg'))$('cmsg').textContent='';drawCo()};
+if($('czn')) $('czn').onchange=drawCo;
+function openCo(){closeAll();if($('cerr'))$('cerr').textContent='';$('cform').style.display='block';$('cthx').style.display='none';$('cok').disabled=false;$('cok').textContent='Confirm order';drawCo();tg('co',true)}
+function submitOrder(){
+  const nm=$('cn').value.trim(),ph=$('cph').value.trim(),ad=$('cad').value.trim(),v=$('czn').value;
+  const err=m=>{if($('cerr'))$('cerr').textContent=m};
+  if(!count()){err('Your cart is empty');return}
+  if(!nm){err('Please enter your name');return}
+  if(ph.replace(/\D/g,'').length<10){err('Please enter a valid phone number');return}
+  if(!ad){err('Please enter your address');return}
+  if(v===''){err('Please choose your delivery area');return}
+  if($('ccode').value.trim()&&!applyCode()){err('Please check your discount code');return}
+  const sub=total(),D=disc(),f=fee(),E=Object.entries(cart).filter(([k])=>find(k));
+  if(!ORDER_URL){err('Ordering is not available right now');return}
+  const id='WAHM-'+Math.floor(10000+Math.random()*90000);
+  const itemsText=E.map(([k,q])=>k+' x'+q+' = '+e(find(k)[2]*q)+' EGP').join('\n');
+  const order={id,name:nm,phone:ph,address:ad,area:ZONES[+v][0],items:itemsText,subtotal:sub,code:D.c?D.c.code:'',discount:D.d,delivery:f,total:sub-D.d+f};
+  const btn=$('cok');btn.disabled=true;btn.textContent='Sending...';err('');
+  fetch(ORDER_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(order)})
+    .then(r=>r.json()).then(j=>{
+      if(!j||!j.ok)throw 0;
+      cart={};save();sync();['cn','cph','cad','ccode'].forEach(i=>$(i).value='');$('czn').value='';appliedCode='';if($('cmsg'))$('cmsg').textContent='';
+      $('coid').textContent=id;$('cform').style.display='none';$('cthx').style.display='block';
+    }).catch(()=>{err('Something went wrong, please try again');btn.disabled=false;btn.textContent='Confirm order'});
+}
+let cur=null,qn=1;
+function openP(nm){
+  cur=find(nm);if(!cur)return;qn=1;$('qn').textContent=1;
+  $('pim').style.background='linear-gradient(160deg,'+cur[3]+',#fff)';
+  const gi=imgs(cur);
+  $('pim').innerHTML=(gi.length>1?`<div class="gal" id="gal">${gi.map(u=>`<img src="${u}" alt="${cur[0]}">`).join('')}</div><button class="gnav gl" data-g="-1" aria-label="Previous">‹</button><button class="gnav gr" data-g="1" aria-label="Next">›</button><div class="dots" id="dots">${gi.map((u,i)=>`<i data-d="${i}" class="${i?'':'on'}"></i>`).join('')}</div>`:art(cur))+`<span class="tag" style="--tc:${TC[cur[1]]||'#8a6a3b'}">${cur[1]}</span>`;
+  const gl=$('gal');
+  if(gl){gl.onscroll=()=>{const i=Math.round(gl.scrollLeft/gl.clientWidth);document.querySelectorAll('#dots i').forEach((d,k)=>d.classList.toggle('on',k===i))}}
+  $('pn').textContent=cur[0]+' - 100 ML';$('pp').textContent=e(cur[2])+' EGP';$('pdsc').textContent=cur[6]||'';
+  const so=out(cur);$('qrow').style.display=so?'none':'flex';$('padd').style.display=$('pbuy').style.display=so?'none':'block';$('psold').style.display=so?'block':'none';tg('pd',true);
+}
+function updWA(){}
+function closeAll(){['sheet','drawer','pd','cartp','co'].forEach(x=>tg(x,false))}
+document.addEventListener('click',ev=>{
+  const gn=ev.target.closest('[data-g]');if(gn&&$('gal')){$('gal').scrollBy({left:+gn.dataset.g*$('gal').clientWidth,behavior:'smooth'});return}
+  const gd=ev.target.closest('[data-d]');if(gd&&$('gal')){$('gal').scrollTo({left:+gd.dataset.d*$('gal').clientWidth,behavior:'smooth'});return}
+  const q=ev.target.closest('.qa');
+  if(q){add(q.dataset.n,1);q.classList.add('ok');setTimeout(()=>q.classList.remove('ok'),900);return}
+  const sc=ev.target.closest('[data-sec]');if(sc){setSec(sc.dataset.sec);if(sc.closest('.drawer')||sc.classList.contains('et'))closeAll();if(sc.classList.contains('chip'))return}
+  const cd=ev.target.closest('[data-p]');if(cd){openP(cd.dataset.p);return}
+  if(ev.target.closest('#pbuy')){add(cur[0],qn);openCo();return}
+  if(ev.target.closest('#cgo')){if(!count()){toast('Your cart is empty');return}openCo();return}
+  if(ev.target.closest('#cback')){tg('co',false);drawCart();tg('cartp',true);return}
+  if(ev.target.closest('#capply')){applyCode();return}
+  if(ev.target.closest('#cok')){submitOrder();return}
+  if(ev.target.closest('#qp')){qn++;$('qn').textContent=qn;updWA();return}
+  if(ev.target.closest('#qm')){if(qn>1)qn--;$('qn').textContent=qn;updWA();return}
+  if(ev.target.closest('#padd')){add(cur[0],qn);closeAll();return}
+  const ma=ev.target.closest('[data-m]');if(ma){add(ma.dataset.m,-1);return}
+  const pa=ev.target.closest('[data-a]');if(pa){add(pa.dataset.a,1);return}
+  if(ev.target.closest('#cclr')){cart={};save();sync();return}
+  if(ev.target.closest('[data-x]')){closeAll();return}
+  const c=ev.target.closest('[data-c]');if(c){cat=c.dataset.c;document.querySelectorAll('[data-c]').forEach(x=>x.classList.toggle('on',x===c));draw();return}
+  const s=ev.target.closest('[data-s]');if(s){sort=s.dataset.s;document.querySelectorAll('[data-s]').forEach(x=>x.classList.toggle('on',x===s));draw();return}
+  if(ev.target.closest('#fb')){tg('sheet',true);return}
+  if(ev.target.closest('#menuB')){tg('drawer',true);return}
+  if(ev.target.closest('#ov')||ev.target.closest('.drawer a')){closeAll()}
+});
+if($('cartB')) $('cartB').onclick=()=>{drawCart();tg('cartp',true)};
+if($('nf')) $('nf').onsubmit=ev=>{ev.preventDefault();toast('Thank you for subscribing');ev.target.reset()};
+function toast(m){const t=$('toast');if(!t)return;t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2000)}
+draw();sync();
+</script>
+</body>
+</html>
