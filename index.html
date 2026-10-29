@@ -605,7 +605,7 @@ function submitOrder(){
   const btn=$('cok');btn.disabled=true;btn.textContent='Sending...';err('');
   fetch(ORDER_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(order)})
     .then(r=>r.json()).then(j=>{
-      if(!j||!j.ok)throw 0;
+if(!j||j.result==='error'||j.status==='error'||j.ok===false)throw 0;
       cart={};save();sync();['cn','cph','cad','ccode'].forEach(i=>$(i).value='');$('czn').value='';appliedCode='';if($('cmsg'))$('cmsg').textContent='';
       $('coid').textContent=id;$('cform').style.display='none';$('cthx').style.display='block';
     }).catch(()=>{err('Something went wrong, please try again');btn.disabled=false;btn.textContent='Confirm order'});
