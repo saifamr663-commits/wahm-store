@@ -249,7 +249,7 @@ const TOP_BAR = {
   show: true,
   texts: [
     'INDULGE YOUR SENSES',
-    'FREE DELIVERY ABOVE 1,500 EGP'
+    'DELIVERY ACROSS EGYPT'
   ]
 };
 
@@ -330,8 +330,13 @@ const FOOTER_SECTION = {
 };
 
 const WA='2011149502071';
-const FREE_FROM=2000;
-const ZONES=[['Cairo',60],['Giza',70],['Alexandria',90],['Other governorates',110]];
+const FREE_FROM=0; // 0 = مفيش توصيل مجاني
+const ZONES=[
+  ['Cairo',100],['Giza',100],
+  ['Alexandria',115],['Beheira',115],
+  ['Dakahlia',125],['El Kalioubia',125],['Gharbia',125],['Kafr Alsheikh',125],['Monufia',125],['Sharqia',125],['Damietta',125],['Ismailia',125],['Port Said',125],['Suez',125],
+  ['Other governorates',150]
+];
 const SOLD_OUT=[];
 
 const CODES=[
@@ -480,12 +485,17 @@ function save(){try{localStorage.setItem('wahmCart',JSON.stringify(cart))}catch(
 function count(){return Object.values(cart).reduce((a,b)=>a+b,0)}
 function add(nm,q){if(q>0&&SOLD_OUT.includes(nm)){toast(nm+' is sold out');return}cart[nm]=(cart[nm]||0)+q;if(cart[nm]<=0)delete cart[nm];save();sync();toast(q>0?nm+' added to cart':nm+' updated')}
 function sync(){if($('cnt'))$('cnt').textContent=count();drawCart()}
-function total(){return Object.entries(cart).reduce((a,[k,v])=>a+(find(k)?find(k)[2]*v:0),0)}
+function raw(){return Object.entries(cart).reduce((a,[k,v])=>a+(find(k)?find(k)[2]*v:0),0)}
+const PAIR_DISCOUNT=100; // خصم على كل ازازتين (550+550=1100 تبقى 1000)
+function bottles(){return Object.entries(cart).filter(([k])=>find(k)).reduce((a,[k,v])=>a+v,0)}
+function bundle(){return Math.floor(bottles()/2)*PAIR_DISCOUNT}
+function total(){return raw()-bundle()}
 function drawCart(){
   if(!$('cl')||!$('ct')) return;
   const E=Object.entries(cart).filter(([k])=>find(k));
   $('cl').innerHTML=E.length?E.map(([k,v])=>`<div class="ci"><div><b>${k}</b><small>${e(find(k)[2])} EGP</small></div><div class="cq"><button data-m="${k}">−</button><b>${v}</b><button data-a="${k}">+</button></div></div>`).join(''):'<p style="padding:14px 0;color:#777">Your cart is empty</p>';
   $('ct').textContent=e(total())+' EGP';
+  if(bundle()>0)$('cl').innerHTML+=`<p style="padding:12px 0;color:#1f9d55;font-weight:600">Pair deal: -${e(bundle())} EGP</p>`;
 }
 
 function setSec(v){
@@ -519,7 +529,7 @@ function drawCo(){
   if(!$('csum')) return;
   const sub=total(),D=disc(),nt=sub-D.d,f=fee(),v=$('czn').value;
   const dl=(FREE_FROM&&nt>=FREE_FROM)?'Free':(v===''?'Choose your area':e(f)+' EGP');
-  $('csum').innerHTML=`<div class="srow"><span>Subtotal</span><span>${e(sub)} EGP</span></div>`+(D.d>0?`<div class="srow" style="color:#1f9d55"><span>Discount (${D.c.code})</span><span>-${e(D.d)} EGP</span></div>`:'')+`<div class="srow"><span>Delivery</span><span>${dl}</span></div><div class="ctot"><span>Total</span><span>${e(nt+f)} EGP</span></div>`;
+  $('csum').innerHTML=`<div class="srow"><span>Subtotal</span><span>${e(raw())} EGP</span></div>`+(bundle()>0?`<div class="srow" style="color:#1f9d55"><span>Pair deal</span><span>-${e(bundle())} EGP</span></div>`:'')+(D.d>0?`<div class="srow" style="color:#1f9d55"><span>Discount (${D.c.code})</span><span>-${e(D.d)} EGP</span></div>`:'')+`<div class="srow"><span>Delivery</span><span>${dl}</span></div><div class="ctot"><span>Total</span><span>${e(nt+f)} EGP</span></div>`;
 }
 if($('ccode')) $('ccode').oninput=()=>{appliedCode='';if($('cmsg'))$('cmsg').textContent='';drawCo()};
 if($('czn')) $('czn').onchange=drawCo;
@@ -537,7 +547,7 @@ function submitOrder(){
   if(!ORDER_URL){err('Ordering is not available right now');return}
   const id='WAHM-'+Math.floor(10000+Math.random()*90000);
   const itemsText=E.map(([k,q])=>k+' x'+q+' = '+e(find(k)[2]*q)+' EGP').join('\n');
-  const order={id,name:nm,phone:ph,address:ad,area:ZONES[+v][0],items:itemsText,subtotal:sub,code:D.c?D.c.code:'',discount:D.d,delivery:f,total:sub-D.d+f};
+  const order={id,name:nm,phone:ph,address:ad,area:ZONES[+v][0],items:itemsText,subtotal:raw(),pairDeal:bundle(),code:D.c?D.c.code:'',discount:D.d,delivery:f,total:sub-D.d+f};
   const btn=$('cok');btn.disabled=true;btn.textContent='Sending...';err('');
   fetch(ORDER_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(order)})
     .then(r=>r.json()).then(j=>{
