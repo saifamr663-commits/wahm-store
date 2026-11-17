@@ -187,7 +187,7 @@ window.addEventListener('error',function(ev){var d=document.createElement('div')
 <main id="top">
 <section class="hero" id="heroSec">
   <small id="heroSmall">LUXURY IS A STATEMENT</small>
-  <h1 id="heroTitle">2 x 100ML For 1,400 EGP</h1>
+  <h1 id="heroTitle">2 x 50ML For 1,000 EGP</h1>
   <a href="#all" class="pill" id="heroBtn">EXPLORE</a>
   <img class="himg" id="heroImg" alt="WAHM Perfume" style="display:none">
   <div class="bot" id="heroBot" style="--c1:#e9e6df;--c2:#9b9890"><i></i><b id="heroBotLbl">WAHM</b></div>
@@ -273,7 +273,7 @@ const TOP_BAR = {
 
 const HERO = {
   smallText: 'LUXURY IS A STATEMENT',
-  mainTitle: '2 x 100ML For 1,000 EGP',
+  mainTitle: '2 x 50ML For 1,000 EGP',
   buttonText: 'EXPLORE',
   showBottle: false,
   bottleColor1: '#e9e6df',
@@ -604,4 +604,25 @@ document.addEventListener('click',ev=>{
   if(ev.target.closest('#qm')){if(qn>1)qn--;$('qn').textContent=qn;updWA();return}
   if(ev.target.closest('#padd')){add(cur[0],qn);closeAll();return}
   const ma=ev.target.closest('[data-m]');if(ma){add(ma.dataset.m,-1);return}
-  const pa=ev.target.closest('[data-a]');if(pa){add(pa.
+  const pa=ev.target.closest('[data-a]');if(pa){add(pa.dataset.a,1);return}
+  if(ev.target.closest('#cclr')){cart={};save();sync();return}
+  if(ev.target.closest('[data-x]')){closeAll();return}
+  const c=ev.target.closest('[data-c]');if(c){cat=c.dataset.c;document.querySelectorAll('[data-c]').forEach(x=>x.classList.toggle('on',x===c));draw();return}
+  const s=ev.target.closest('[data-s]');if(s){sort=s.dataset.s;document.querySelectorAll('[data-s]').forEach(x=>x.classList.toggle('on',x===s));draw();return}
+  if(ev.target.closest('#fb')){tg('sheet',true);return}
+  if(ev.target.closest('#menuB')){tg('drawer',true);return}
+  if(ev.target.closest('#ov')||ev.target.closest('.drawer a')){closeAll()}
+});
+if($('cartB')) $('cartB').onclick=()=>{drawCart();tg('cartp',true)};
+if($('nf')) $('nf').onsubmit=ev=>{ev.preventDefault();toast('Thank you for subscribing');ev.target.reset()};
+function toast(m){const t=$('toast');if(!t)return;t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2000)}
+draw();sync();
+/* افتح الموقع دايماً من أول الصفحة (الهيرو) */
+try{if('scrollRestoration' in history)history.scrollRestoration='manual';if(location.hash)history.replaceState(null,'',location.pathname+location.search)}catch(x){}
+window.scrollTo(0,0);
+window.addEventListener('load',()=>window.scrollTo(0,0));
+window.addEventListener('pageshow',()=>window.scrollTo(0,0));
+setTimeout(()=>window.scrollTo(0,0),300);
+</script>
+</body>
+</html>
